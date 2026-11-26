@@ -1,5 +1,11 @@
 const { UserDAO } = require("../dao");
 
+const withoutPassword = (user) => {
+  const plain = user?.toObject ? user.toObject() : { ...user };
+  delete plain.password;
+  return plain;
+};
+
 const saveUser = async (req, res, next) => {
   try {
     const { body } = req;
@@ -7,11 +13,29 @@ const saveUser = async (req, res, next) => {
     res.json({
       success: true,
       message: "User saved successfully",
-      data: savedUserData,
+      data: savedUserData.map(withoutPassword),
     });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error?.message, data: [] });
+  }
+};
+
+const loginUser = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await UserDAO.loginUser(email, password);
+    if (!user) {
+      return res.json({
+        success: false,
+        message: "Invalid email or password",
+        data: [],
+      });
+    }
+    res.json({ success: true, message: "Login successful", data: [user] });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: "Login failed", data: [] });
   }
 };
 
@@ -37,7 +61,7 @@ const updateUser = async (req, res, next) => {
     res.json({
       success: true,
       message: "User updated successfully",
-      data: userData,
+      data: userData ? withoutPassword(userData) : userData,
     });
   } catch (error) {
     console.log(error);
@@ -60,4 +84,4 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-module.exports = { saveUser, getUser, updateUser, deleteUser };
+module.exports = { saveUser, loginUser, getUser, updateUser, deleteUser };

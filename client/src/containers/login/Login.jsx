@@ -12,11 +12,11 @@ const Login = () => {
   const { Title } = Typography;
 
   const onFinish = (values) => {
-    console.log(values);
     axios
-      .get(
-        `http://localhost:3000/user?email=${values?.username}&password=${values?.password}`
-      )
+      .post("http://localhost:3000/user/login", {
+        email: values?.username,
+        password: values?.password,
+      })
       .then((response) => {
         alert(response?.data?.message);
         if (response?.data?.success) {

@@ -71,8 +71,8 @@ npm run frontend:dev        # client on http://localhost:5173 (new terminal)
 
 This is a learning project and not ready for real users.
 
-- Passwords are stored as plain text, and login is a `GET /user?email=&password=` request, so credentials appear in the URL. Planned fix: bcrypt hashing, JWT, and `POST /user/login`.
-- The request logger prints request bodies, including passwords, to the console.
+- Passwords are hashed with bcryptjs (12 rounds) before they are saved, and login is `POST /user/login`, so credentials are no longer in the URL. The password field is excluded from queries and from API responses, and the request logger redacts `password` and `re-password`. Accounts created before this change have plain-text passwords and must be re-created.
+- There is no JWT or session token yet: after login the client keeps the user in Redux state only, and the other `/user`, `/note`, `/lead` and `/event` routes are not protected. There is also no rate limiting on login.
 - The API returns HTTP 200 with `success: false` for errors, and there is no input validation.
 - The client has `http://localhost:3000` written into its requests.
 - No automated tests.

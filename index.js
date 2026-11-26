@@ -35,11 +35,26 @@ mongoose
     console.log(error);
   });
 
+const SENSITIVE_FIELDS = ["password", "re-password"];
+
+const redact = (data) => {
+  if (!data || typeof data !== "object") {
+    return data;
+  }
+  const copy = { ...data };
+  SENSITIVE_FIELDS.forEach((field) => {
+    if (field in copy) {
+      copy[field] = "[REDACTED]";
+    }
+  });
+  return copy;
+};
+
 app.use((req, res, next) => {
   console.log(
     `${new Date()} :: ${req.method} :: ${req.path} :: ${JSON.stringify(
-      req.query
-    )} :: ${JSON.stringify(req.params)} :: ${JSON.stringify(req.body)}`
+      redact(req.query)
+    )} :: ${JSON.stringify(req.params)} :: ${JSON.stringify(redact(req.body))}`
   );
   next();
 });

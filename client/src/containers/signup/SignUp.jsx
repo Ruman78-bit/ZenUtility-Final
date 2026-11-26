@@ -31,7 +31,7 @@ const SignUp = () => {
     axios
       .post("http://localhost:3000/user", values)
       .then((response) => {
-        console.log("singup Response ", response);
+        
         alert(response?.data?.message);
         if (response?.data?.success) {
           navigate("/");
